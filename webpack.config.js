@@ -4,13 +4,26 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 const TerserPlugin = require("terser-webpack-plugin");
 
+const appConfigs = {
+  counter: {
+    entry: "./src/app1/main.js",
+    template: "./counter.html",
+    port: 8080
+  },
+  person: {
+    entry: "./src/app2/main.js",
+    template: "./person.html",
+    port: 8081
+  }
+};
+
 module.exports = (env) => {
-  const isCounter = env.app === "counter";
+  const appConfig = appConfigs[env.app];
 
   return {
     mode: "development",
     entry: {
-      [env.app]: isCounter ? "./src/app1/main.js" : "./src/app2/main.js",
+      [env.app]: appConfig.entry
     },
     output: {
       path: path.resolve(__dirname, "dist", env.app),
@@ -34,7 +47,7 @@ module.exports = (env) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: isCounter ? "./counter.html" : "./person.html",
+        template: appConfig.template,
         filename: "index.html",
       }),
       new VueLoaderPlugin(),
@@ -43,7 +56,7 @@ module.exports = (env) => {
       static: {
         directory: path.join(__dirname, "dist", env.app),
       },
-      port: isCounter ? 8080 : 8081,
+      port: appConfig.port,
       hot: true,
       open: true,
     },
